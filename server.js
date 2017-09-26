@@ -3,8 +3,9 @@ const PORT = process.env.PORT || 3000
 const mime = require('mime')
 const url = require('url')
 const fileHandler = require('./file-handler')
-const apiHandler = require('./file-handler')
+const apiHandler = require('./api-handler')
 const API_ROUTE = 'api'
+const path = require('path')
 
 function send404(req, res) {
     res.writeHead(404, {
@@ -24,9 +25,12 @@ http.createServer(urlMapper).listen(PORT)
 
 function urlMapper (req, res) {
     const parsedUrl = url.parse(req.url)
-    const resources =  parsedUrl.pathname.split('/')
+    console.log(parsedUrl)
+    const resources =  parsedUrl.pathname.split('/').filter(e => e)
     const [service, ...rest] = resources
-    if (service === API_ROUTE) return apiHandler(req, res)
+    const apiSuffix = path.join(...rest)
+    console.log(resources)
+    if (service === API_ROUTE) return apiHandler(req, res, apiSuffix)
     return fileHandler(req, res, parsedUrl)
 }
 
